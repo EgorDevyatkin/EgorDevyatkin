@@ -1,0 +1,31 @@
+---
+import { sportLabel, formatDate, formatDistance } from '../lib/sport';
+
+interface Props {
+  slug: string;
+  title: string;
+  date: Date;
+  sport: string;
+  durationLabel: string;
+  distanceKm?: number;
+  avgHr?: number;
+  source: string;
+}
+
+const { slug, title, date, sport, durationLabel, distanceKm, avgHr, source } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<a class="workout-card" href={`${base}/workouts/${slug}`}>
+  <div class="row">
+    <h3>{title}</h3>
+    <time datetime={date.toISOString()}>{formatDate(date)}</time>
+  </div>
+  <div class="meta">
+    <span class={`tag ${sport}`}>{sportLabel(sport)}</span>
+    <span>{durationLabel}</span>
+    {distanceKm && <span>{formatDistance(distanceKm)}</span>}
+    {avgHr && <span>{avgHr} уд/мин</span>}
+    <span class="source-badge">{source === 'coros' ? 'COROS' : 'вручную'}</span>
+  </div>
+</a>

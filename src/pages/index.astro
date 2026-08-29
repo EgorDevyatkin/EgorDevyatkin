@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+import WorkoutCard from '../components/WorkoutCard.astro';
+import { getCollection } from 'astro:content';
+import { sportLabel } from '../lib/sport';
+
+const all = await getCollection('workouts');
+all.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const sports = ['all', ...new Set(all.map((w) => w.data.sport))];
+
+const totalDistance = all.reduce((sum, w) => sum + (w.data.distanceKm ?? 0), 0);
+const totalMinutes = all.reduce((sum, w) => sum + w.data.durationMinutes, 0);
+---
+
+<Layout title="Дневник тренировок — Егор Девяткин">
+  <section class="stats-grid">
+    <div class="stat">
+      <div class="value">{all.length}</div>
+      <div class="label">Тренировок</div>
+    </div>
+    <div class="stat">
+      <div class="value">{totalDistance.toFixed(0)} км</div>
+      <div class="label">Дистанция</div>
+    </div>
+    <div class="stat">
+      <div class="value">{Math.round(totalMinutes / 60)} ч</div>
+      <div class="label">Время</div>
+    </div>
+  </section>
+
+  <div class="filters" id="filters">
+    {sports.map((s, i) => (
+      <button type="button" data-sport={s} class={i === 0 ? 'active' : ''}>
+        {s === 'all' ? 'Все' : sportLabel(s)}
+      </button>
+    ))}
+  </div>
+
+  <div class="timeline" id="timeline">
+    {all.map((w) => (
+      <div class="timeline-item" data-sport={w.data.sport}>
+        <WorkoutCard
+          slug={w.slug}
+          title={w.data.title}
+          date={w.data.date}
+          sport={w.data.sport}
+          durationLabel={w.data.durationLabel}
+          distanceKm={w.data.distanceKm}
+          avgHr={w.data.avgHr}
+          source={w.data.source}
+        />
+      </div>
+    ))}
+  </div>
+
+  <script>
+    const filters = document.getElementById('filters');
+    const items = document.querySelectorAll<HTMLElement>('#timeline .timeline-item');
+
+    filters?.addEventListener('click', (event) => {
+      const button = (event.target as HTMLElement).closest('button');
+      if (!button) return;
+      filters.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+      button.classList.add('active');
+      const sport = button.dataset.sport;
+      items.forEach((item) => {
+        item.style.display = sport === 'all' || item.dataset.sport === sport ? '' : 'none';
+      });
+    });
+  </script>
+</Layout>
