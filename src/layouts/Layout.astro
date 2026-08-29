@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Публичный дневник тренировок Егора Девяткина.' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const path = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="site-header">
+        <h1>Дневник тренировок</h1>
+        <p>{description}</p>
+        <nav class="site-nav">
+          <a href={base} class={path === base || path === `${base}/` ? 'active' : ''}>Все тренировки</a>
+          <a href={`${base}/about`} class={path.includes('/about') ? 'active' : ''}>О дневнике</a>
+        </nav>
+      </header>
+      <slot />
+      <footer class="site-footer">
+        Данные синхронизируются с COROS и дополняются вручную. Исходники на
+        <a href="https://github.com/EgorDevyatkin/EgorDevyatkin" target="_blank" rel="noopener">GitHub</a>.
+      </footer>
+    </div>
+  </body>
+</html>

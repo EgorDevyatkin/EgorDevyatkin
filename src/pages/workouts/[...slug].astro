@@ -1,0 +1,74 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { sportLabel, formatDate, formatDistance } from '../../lib/sport';
+
+export async function getStaticPaths() {
+  const workouts = await getCollection('workouts');
+  return workouts.map((w) => ({ params: { slug: w.slug }, props: { entry: w } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'workouts'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await entry.render();
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={`${data.title} — Дневник тренировок`}>
+  <div class="detail-header">
+    <a class="back" href={base}>&larr; Ко всем тренировкам</a>
+    <h1>{data.title}</h1>
+    <div class="meta">
+      <span class={`tag ${data.sport}`}>{sportLabel(data.sport)}</span>
+      <time>{formatDate(data.date)}</time>
+      <span class="source-badge">{data.source === 'coros' ? 'COROS' : 'вручную'}</span>
+    </div>
+  </div>
+
+  <div class="detail-stats">
+    <div class="stat">
+      <div class="value">{data.durationLabel}</div>
+      <div class="label">Время</div>
+    </div>
+    {data.distanceKm && (
+      <div class="stat">
+        <div class="value">{formatDistance(data.distanceKm)}</div>
+        <div class="label">Дистанция</div>
+      </div>
+    )}
+    {data.avgHr && (
+      <div class="stat">
+        <div class="value">{data.avgHr}</div>
+        <div class="label">Ср. пульс</div>
+      </div>
+    )}
+    {data.avgPace && (
+      <div class="stat">
+        <div class="value">{data.avgPace}</div>
+        <div class="label">Темп</div>
+      </div>
+    )}
+    {data.avgSpeed && (
+      <div class="stat">
+        <div class="value">{data.avgSpeed}</div>
+        <div class="label">Скорость</div>
+      </div>
+    )}
+    {data.calories && (
+      <div class="stat">
+        <div class="value">{data.calories}</div>
+        <div class="label">Ккал</div>
+      </div>
+    )}
+  </div>
+
+  {data.location && <p class="location">Место: {data.location}</p>}
+
+  <div class="notes">
+    <Content />
+  </div>
+</Layout>
