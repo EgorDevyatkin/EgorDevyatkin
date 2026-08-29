@@ -5,8 +5,12 @@
 ## Дневник тренировок
 
 Статический сайт на [Astro](https://astro.build), собранный из markdown-файлов
-в `src/content/workouts/`. После включения GitHub Pages для репозитория
-(Settings → Pages → Source: GitHub Actions) сайт будет доступен по адресу:
+в `src/content/workouts/`. Деплой на GitHub Pages настроен через классический
+способ — GitHub Action собирает сайт и пушит результат в ветку `gh-pages`.
+
+Чтобы включить показ сайта (один раз): **Settings → Pages → Source: Deploy
+from a branch**, ветка `gh-pages`, папка `/ (root)`. Ветка `gh-pages` появится
+сама после первого прогона workflow на `main`. Сайт будет доступен по адресу:
 
 ```
 https://egordevyatkin.github.io/EgorDevyatkin/
